@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Te Amo Romántico</title>
+<style>
+    body {
+        margin: 0;
+        overflow: hidden;
+        height: 100vh;
+        background: linear-gradient(135deg, #ff99cc, #ff6699, #ff3366);
+        background-size: 300% 300%;
+        animation: gradientMove 12s ease infinite;
+        font-family: 'Arial', cursive;
+        position: relative;
+        cursor: crosshair;
+    }
+
+    @keyframes gradientMove {
+        0% {background-position: 0% 50%;}
+        50% {background-position: 100% 50%;}
+        100% {background-position: 0% 50%;}
+    }
+
+    .falling {
+        position: absolute;
+        top: -50px;
+        color: #fff;
+        text-shadow: 0 0 15px rgba(255,255,255,0.8);
+        animation: fall linear forwards;
+        white-space: nowrap;
+        font-weight: bold;
+        pointer-events: auto;
+    }
+
+    @keyframes fall {
+        0% {transform: translateY(0);}
+        100% {transform: translateY(110vh); opacity: 0;}
+    }
+
+    .spark {
+        position: absolute;
+        width: 5px;
+        height: 5px;
+        background: white;
+        border-radius: 50%;
+        opacity: 0.8;
+        pointer-events: none;
+    }
+
+    .click-text {
+        position: absolute;
+        color: #fff;
+        font-size: 2rem;
+        font-weight: bold;
+        text-shadow: 0 0 15px #fff, 0 0 30px #ff99cc;
+        opacity: 1;
+        animation: pop 1.5s ease forwards;
+        pointer-events: none;
+    }
+
+    @keyframes pop {
+        0% {transform: scale(0.5); opacity: 1;}
+        70% {transform: scale(1.2);}
+        100% {transform: scale(1); opacity: 0;}
+    }
+</style>
+</head>
+<body>
+
+<script>
+    const colors = ['#ff3366','#ff6699','#ff99cc','#ffffff','#ffb6c1'];
+    const texts = ['❤️','💕','💖','Te Amo','💘','Amor','💞'];
+
+    function createFallingElement() {
+        const el = document.createElement('div');
+        el.classList.add('falling');
+
+        // Texto o corazón aleatorio
+        el.textContent = texts[Math.floor(Math.random()*texts.length)];
+
+        // Posición horizontal aleatoria
+        el.style.left = Math.random() * window.innerWidth + 'px';
+
+        // Tamaño aleatorio
+        const size = Math.random() * 30 + 15;
+        el.style.fontSize = size + 'px';
+
+        // Color aleatorio
+        el.style.color = colors[Math.floor(Math.random()*colors.length)];
+
+        // Duración aleatoria para variar velocidad
+        const duration = Math.random() * 3 + 2; // 2 a 5 segundos
+        el.style.animationDuration = duration + 's';
+
+        // Evento para explosión al llegar al suelo
+        el.addEventListener('animationend', () => {
+            explode(el.offsetLeft, window.innerHeight);
+            el.remove();
+        });
+
+        // Explosión al pasar cursor
+        el.addEventListener('mouseenter', () => {
+            explode(el.offsetLeft, el.offsetTop);
+            el.remove();
+        });
+
+        document.body.appendChild(el);
+    }
+
+    function explode(x, y) {
+        for (let i = 0; i < 10; i++) {
+            const spark = document.createElement('div');
+            spark.classList.add('spark');
+            spark.style.background = colors[Math.floor(Math.random()*colors.length)];
+            spark.style.left = x + 'px';
+            spark.style.top = y + 'px';
+            document.body.appendChild(spark);
+
+            const angle = Math.random() * 2 * Math.PI;
+            const distance = Math.random() * 80;
+            const dx = Math.cos(angle) * distance;
+            const dy = Math.sin(angle) * distance;
+
+            spark.animate([
+                {transform: `translate(0,0)`, opacity: 1},
+                {transform: `translate(${dx}px, ${dy}px)`, opacity: 0}
+            ], {
+                duration: 700 + Math.random()*500,
+                easing: 'ease-out'
+            });
+
+            setTimeout(() => spark.remove(), 1200);
+        }
+    }
+
+    // Generar elementos constantemente
+    setInterval(() => {
+        for (let i = 0; i < 3; i++) { // Aumenta si quieres más densidad
+            createFallingElement();
+        }
+    }, 200);
+
+    // Evento click/touch para crear "Te Amo"
+    document.addEventListener('click', (e) => {
+        createClickText(e.clientX, e.clientY);
+    });
+
+    document.addEventListener('touchstart', (e) => {
+        const touch = e.touches[0];
+        createClickText(touch.clientX, touch.clientY);
+    });
+
+    function createClickText(x, y) {
+        const clickText = document.createElement('div');
+        clickText.classList.add('click-text');
+        clickText.textContent = '¡Te Amo!';
+        clickText.style.left = (x - 50) + 'px';
+        clickText.style.top = (y - 20) + 'px';
+        document.body.appendChild(clickText);
+        setTimeout(() => clickText.remove(), 1500);
+    }
+</script>
+
+</body>
+</html>
